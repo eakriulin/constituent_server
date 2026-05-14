@@ -60,3 +60,4 @@ Desktop.ini
 # Misc
 ed25519/
 *.txt
+!CMakeLists.txt
