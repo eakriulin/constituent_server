@@ -18,7 +18,7 @@ LLMService::LLMService(
 
 Constituent LLMService::enrich(EnrichConstituentDto &&dto) {
     httplib::Client client("https://api.openai.com");
-    constexpr std::string path = "/v1/responses";
+    const std::string path = "/v1/responses";
 
     const httplib::Headers headers = {
         {"Authorization", std::format("Bearer {}", this->api_key)},

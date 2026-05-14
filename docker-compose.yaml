@@ -1,0 +1,50 @@
+services:
+  db:
+    container_name: 'constituent-postgres'
+    image: 'postgres:18-alpine'
+    environment:
+      POSTGRES_USER: '${DB_USERNAME}'
+      POSTGRES_PASSWORD: '${DB_PASSWORD}'
+      POSTGRES_DB: 'constituent'
+    env_file:
+      - '.env'
+    volumes:
+      - 'pgdata:/var/lib/postgresql'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$$DB_USERNAME" -d constituent']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  migrate:
+    container_name: 'constituent-migrate'
+    image: 'constituent-migrate'
+    build:
+      context: .
+      dockerfile: 'Dockerfile_migrate'
+    env_file:
+      - '.env'
+    depends_on:
+      db:
+        condition: 'service_healthy'
+
+  server:
+    container_name: 'constituent-server'
+    image: 'constituent-server'
+    build:
+      context: .
+      dockerfile: 'Dockerfile_server'
+    ports:
+      - '5050:5050'
+    env_file:
+      - '.env'
+    depends_on:
+      db:
+        condition: 'service_healthy'
+      migrate:
+        condition: 'service_completed_successfully'
+    restart: unless-stopped
+
+volumes:
+  pgdata:

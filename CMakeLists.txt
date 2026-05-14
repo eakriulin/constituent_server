@@ -1,11 +1,24 @@
-cmake_minimum_required(VERSION 4.1)
+cmake_minimum_required(VERSION 3.25)
 project(constituent)
 
 set(CMAKE_CXX_STANDARD 23)
 
-execute_process(COMMAND brew --prefix libpqxx OUTPUT_VARIABLE LIBPQXX_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
-find_path(PQXX_INCLUDE_DIR pqxx/pqxx HINTS "${LIBPQXX_PREFIX}/include" REQUIRED)
-find_library(PQXX_LIBRARY pqxx HINTS "${LIBPQXX_PREFIX}/lib" REQUIRED)
+find_package(PkgConfig REQUIRED)
+
+if(APPLE)
+    execute_process(COMMAND brew --prefix libpq
+            OUTPUT_VARIABLE LIBPQ_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+    execute_process(COMMAND brew --prefix libpqxx
+            OUTPUT_VARIABLE LIBPQXX_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+    if(LIBPQ_PREFIX)
+        set(ENV{PKG_CONFIG_PATH} "${LIBPQ_PREFIX}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+    endif()
+    if(LIBPQXX_PREFIX)
+        set(ENV{PKG_CONFIG_PATH} "${LIBPQXX_PREFIX}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
+    endif()
+endif()
+
+pkg_check_modules(PQXX REQUIRED IMPORTED_TARGET libpqxx)
 
 find_package(OpenSSL REQUIRED)
 
@@ -60,8 +73,11 @@ add_executable(server
         src/app/services/rate_limits.cpp
         src/app/services/rate_limits.h
 )
-target_include_directories(server PRIVATE ${PQXX_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/dependencies ${CMAKE_SOURCE_DIR}/dependencies/jwt-cpp)
-target_link_libraries(server PRIVATE ${PQXX_LIBRARY} OpenSSL::SSL OpenSSL::Crypto "-framework CoreFoundation" "-framework Security")
+target_include_directories(server PRIVATE ${CMAKE_SOURCE_DIR}/dependencies ${CMAKE_SOURCE_DIR}/dependencies/jwt-cpp)
+target_link_libraries(server PRIVATE PkgConfig::PQXX OpenSSL::SSL OpenSSL::Crypto)
+if(APPLE)
+    target_link_libraries(server PRIVATE "-framework CoreFoundation" "-framework Security")
+endif()
 
 add_executable(migrate
         src/migrate.cpp
@@ -78,5 +94,5 @@ add_executable(migrate
         src/app/types/llm.h
         src/app/types/rate_limits.h
 )
-target_include_directories(migrate PRIVATE ${PQXX_INCLUDE_DIR} ${CMAKE_SOURCE_DIR}/dependencies)
-target_link_libraries(migrate PRIVATE ${PQXX_LIBRARY})
+target_include_directories(migrate PRIVATE ${CMAKE_SOURCE_DIR}/dependencies)
+target_link_libraries(migrate PRIVATE PkgConfig::PQXX)

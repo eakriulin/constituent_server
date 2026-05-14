@@ -1,0 +1,40 @@
+FROM debian:trixie-slim AS builder
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        cmake \
+        ninja-build \
+        pkg-config \
+        libpqxx-dev \
+        libssl-dev \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /src
+COPY CMakeLists.txt ./
+COPY src ./src
+COPY dependencies ./dependencies
+
+ARG BUILD_JOBS=1
+RUN cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+    && cmake --build build --parallel ${BUILD_JOBS}
+
+FROM debian:trixie-slim AS runtime
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libpqxx-7.10 \
+        libssl3 \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd --system appgroup \
+    && useradd --system --gid appgroup --no-create-home --shell /usr/sbin/nologin appuser
+
+WORKDIR /app
+COPY --from=builder /src/build/server /app/server
+
+USER appuser
+EXPOSE 5050
+CMD ["/app/server"]

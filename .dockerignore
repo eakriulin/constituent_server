@@ -1,9 +1,9 @@
-# Build
+# Build outputs
 build/
 cmake-build-*/
 out/
 
-# CMake
+# CMake artefacts
 CMakeCache.txt
 CMakeFiles/
 CMakeScripts/
@@ -13,7 +13,7 @@ Makefile
 *.cmake
 !CMakeLists.txt
 
-# Compiled
+# Compiled binaries
 *.o
 *.obj
 *.a
@@ -26,7 +26,7 @@ Makefile
 *.out
 *.app
 
-# Debug
+# Debug symbols
 *.dSYM/
 *.su
 *.idb
@@ -44,21 +44,32 @@ Makefile
 .cache/
 compile_commands.json
 
-# macOS
+# OS junk
 .DS_Store
 .AppleDouble
 .LSOverride
-
-# Linux
-*.bak
-
-# Windows
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 
-# Misc
-ed25519/
-*.txt
-!CMakeLists.txt
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Docker
+Dockerfile_server
+.dockerignore
+docker-compose.yml
+docker-compose.*.yml
+
+# Secrets — never bake into image
 .env
+.env.*
+ed25519/
+*.pem
+*.key
+
+# Docs
+*.md
+LICENSE
