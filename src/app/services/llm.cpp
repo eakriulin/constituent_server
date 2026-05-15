@@ -44,8 +44,8 @@ Constituent LLMService::enrich(EnrichConstituentDto &&dto) {
     });
 
     log::info(std::format(
-        "llm_service response | request_path={} response_status={} response_body={}",
-        path, response->status, format_response_body(response->body))
+        "llm_service response | request_path={} response_status={}",
+        path, response->status)
     );
 
     return this->to_constituent(response);
