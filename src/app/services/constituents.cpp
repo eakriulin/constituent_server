@@ -23,7 +23,7 @@ void ConstituentsService::remove(RemoveConstituentDto &&dto) const {
 }
 
 Constituent ConstituentsService::enrich(EnrichConstituentDto &&dto) const {
-    return std::move(this->llm_service->enrich(std::move(dto)));
+    return this->llm_service->enrich(std::move(dto));
 }
 
 void ConstituentsService::remove_all_for_user() const {

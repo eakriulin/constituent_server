@@ -1,5 +1,3 @@
-#define CPPHTTPLIB_OPENSSL_SUPPORT
-
 #include "llm.h"
 
 #include <algorithm>
@@ -44,8 +42,8 @@ Constituent LLMService::enrich(EnrichConstituentDto &&dto) {
     });
 
     log::info(std::format(
-        "llm_service response | request_path={} response_status={}",
-        path, response->status)
+        "llm_service response | request_path={} response_status={} response_body={}",
+        path, response->status, format_response_body(response->body))
     );
 
     return this->to_constituent(response);

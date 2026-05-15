@@ -74,6 +74,7 @@ add_executable(server
         src/app/services/rate_limits.h
 )
 target_include_directories(server PRIVATE ${CMAKE_SOURCE_DIR}/dependencies ${CMAKE_SOURCE_DIR}/dependencies/jwt-cpp)
+target_compile_definitions(server PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)
 target_link_libraries(server PRIVATE PkgConfig::PQXX OpenSSL::SSL OpenSSL::Crypto)
 if(APPLE)
     target_link_libraries(server PRIVATE "-framework CoreFoundation" "-framework Security")
