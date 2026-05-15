@@ -62,3 +62,9 @@ ed25519/
 *.txt
 !CMakeLists.txt
 .env
+.env.*
+nginx.conf
+nginx.conf.*
+postgres.conf
+postgres.conf.*
+*.sh

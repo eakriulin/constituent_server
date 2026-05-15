@@ -69,6 +69,11 @@ docker-compose.*.yml
 ed25519/
 *.pem
 *.key
+nginx.conf
+nginx.conf.*
+postgres.conf
+postgres.conf.*
+*.sh
 
 # Docs
 *.md
